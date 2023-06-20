@@ -6,13 +6,11 @@
 //  Copyright (c) Combine Community. All rights reserved.
 //
 
-import Foundation
 import Combine
+import Foundation
 import RealmSwift
 
-
 class Delete<Input, Failure: Error>: Subscriber, Cancellable {
-        
     public let combineIdentifier = CombineIdentifier()
         
     private let onError: ((Swift.Error) -> Void)?
@@ -33,7 +31,7 @@ class Delete<Input, Failure: Error>: Subscriber, Cancellable {
             try realm.write { [weak self] in
                 self?.deleteFromRealm(realm, input: input)
             }
-        } catch let error {
+        } catch {
             onError?(error)
         }
         return .unlimited
@@ -73,9 +71,10 @@ final class DeleteOne<Input: Object, Failure: Error>: Delete<Input, Failure> {
 final class DeleteMany<Input: Sequence, Failure: Error>: Delete<Input, Failure> where Input.Iterator.Element: Object {
     override func realmInstance(from input: Input) throws -> Realm {
         guard var generator = input.makeIterator() as Input.Iterator?,
-            let first = generator.next(),
-            let realm = first.realm else {
-                throw CombineRealmError.unknown
+              let first = generator.next(),
+              let realm = first.realm
+        else {
+            throw CombineRealmError.unknown
         }
         return realm
     }
@@ -86,7 +85,6 @@ final class DeleteMany<Input: Sequence, Failure: Error>: Delete<Input, Failure> 
 }
 
 public extension Publisher where Output: Object, Failure: Error {
-    
     /**
      Subscribes publisher to subscriber which deletes objects from a Realm. The objects are deleted from the default realm instance `Realm()`.
 
@@ -104,13 +102,12 @@ public extension Publisher where Output: Object, Failure: Error {
      */
     func deleteFromRealm(onError: ((Swift.Error) -> Void)? = nil) -> AnyCancellable {
         let subscriber = DeleteOne<Output, Failure>(onError: onError)
-        self.subscribe(subscriber)
+        subscribe(subscriber)
         return AnyCancellable(subscriber)
     }
 }
 
 public extension Publisher where Output: Sequence, Failure: Error, Output.Iterator.Element: Object {
-    
     /**
      Subscribes publisher to subscriber which deletes objects from a Realm. The objects are deleted from the default realm instance `Realm()`.
 
@@ -128,7 +125,7 @@ public extension Publisher where Output: Sequence, Failure: Error, Output.Iterat
      */
     func deleteFromRealm(onError: ((Swift.Error) -> Void)? = nil) -> AnyCancellable {
         let subscriber = DeleteMany<Output, Failure>(onError: onError)
-        self.subscribe(subscriber)
+        subscribe(subscriber)
         return AnyCancellable(subscriber)
     }
 }
