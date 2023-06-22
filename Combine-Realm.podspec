@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name             = "Combine-Realm"
-  s.version          = "2.1.1"
+  s.version          = "2.1.2"
   s.summary          = "A Combine wrapper of Realm's notifications and write bindings"
 
   s.description      = <<-DESC
@@ -23,6 +23,6 @@ Pod::Spec.new do |s|
 
   s.swift_version = "5.1"
 
-  s.dependency 'RealmSwift', '~> 10.40.0'
+  s.dependency 'RealmSwift', '~> 10.36.0'
 
 end
