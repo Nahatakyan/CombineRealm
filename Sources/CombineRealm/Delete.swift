@@ -12,19 +12,19 @@ import RealmSwift
 
 class Delete<Input, Failure: Error>: Subscriber, Cancellable {
     public let combineIdentifier = CombineIdentifier()
-        
+
     private let onError: ((Swift.Error) -> Void)?
     private var subscription: Subscription?
-    
+
     init(onError: ((Swift.Error) -> Void)?) {
         self.onError = onError
     }
-    
+
     func receive(subscription: Subscription) {
         self.subscription = subscription
         subscription.request(.unlimited)
     }
-        
+
     func receive(_ input: Input) -> Subscribers.Demand {
         do {
             let realm = try realmInstance(from: input)
@@ -36,19 +36,19 @@ class Delete<Input, Failure: Error>: Subscriber, Cancellable {
         }
         return .unlimited
     }
-    
+
     func realmInstance(from input: Input) throws -> Realm {
         preconditionFailure("Subclasses must override this method")
     }
-    
+
     func deleteFromRealm(_ realm: Realm, input: Input) {
         preconditionFailure("Subclasses must override this method")
     }
-    
+
     func receive(completion: Subscribers.Completion<Failure>) {
         subscription = nil
     }
-    
+
     func cancel() {
         subscription?.cancel()
         subscription = nil
@@ -78,7 +78,7 @@ final class DeleteMany<Input: Sequence, Failure: Error>: Delete<Input, Failure> 
         }
         return realm
     }
-    
+
     override func deleteFromRealm(_ realm: Realm, input: Input) {
         realm.delete(input)
     }
@@ -93,7 +93,7 @@ public extension Publisher where Output: Object, Failure: Error {
     func deleteFromRealm() -> AnyCancellable {
         return deleteFromRealm(onError: nil)
     }
-        
+
     /**
      Subscribes publisher to subscriber which deletes objects from a Realm.
 
@@ -116,7 +116,7 @@ public extension Publisher where Output: Sequence, Failure: Error, Output.Iterat
     func deleteFromRealm() -> AnyCancellable {
         return deleteFromRealm(onError: nil)
     }
-    
+
     /**
      Subscribes publisher to subscriber which deletes objects from a Realm.
 

@@ -14,7 +14,7 @@ let package = Package(
             targets: ["CombineRealm"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-swift", .exactItem("10.36.0"))
+        .package(url: "https://github.com/realm/realm-swift", .upToNextMajor(from: "10.40.0"))
     ],
     targets: [
         .target(
